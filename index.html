@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e1e1e">
+    <title>경험치, 골드 계산기</title>
+    <style>
+        /* 다크 모드 색상 변수 */
+        :root {
+            --primary-color: #0a84ff;
+            --background-color: #121212;
+            --container-bg: #1e1e1e;
+            --input-bg-color: #2c2c2c;
+            --text-color: #f5f5f5;
+            --label-color: #c0c0c0;
+            --border-color: #3c3c3c;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --error-color: #ff5252;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--container-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: var(--text-color);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--label-color);
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background-color: var(--input-bg-color);
+            color: var(--text-color);
+        }
+        
+        ::placeholder {
+            color: var(--label-color);
+            opacity: 0.6;
+        }
+
+        #expInput, #goldInput {
+            text-align: center;
+            height: 48px; 
+        }
+
+        .time-inputs {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .time-inputs .input-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .time-inputs input {
+            text-align: center;
+        }
+
+        #calculateBtn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: background-color 0.2s;
+        }
+
+        #calculateBtn:hover {
+            opacity: 0.9;
+        }
+
+        .validation-message {
+            color: var(--error-color);
+            text-align: center;
+            margin-top: 15px;
+            min-height: 2.8em; 
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+
+        .result-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .result-section h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+        
+        .result-group {
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            overflow: hidden; 
+        }
+
+        .result-group h3 {
+            margin: 0;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--text-color);
+            text-align: center;
+            background-color: var(--input-bg-color);
+        }
+        
+        .result-items-wrapper {
+            padding: 10px 15px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5px;
+        }
+
+        .result-group .result-item:not(:last-child) {
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .result-item span {
+            color: var(--label-color);
+            font-weight: 600;
+            min-width: 110px;
+        }
+
+        .result-item strong {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+          -webkit-appearance: none; 
+          margin: 0; 
+        }
+        input[type=number] {
+          -moz-appearance: textfield;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>경험치, 골드 계산기</h1>
+
+        <div class="input-group">
+            <label for="expInput">획득 경험치 (%)</label>
+            <input type="number" id="expInput" step="0.0001" placeholder="예: 0.1234">
+        </div>
+        <div class="input-group">
+            <label for="goldInput">획득 골드</label>
+            <input type="text" id="goldInput" placeholder="골드를 입력하세요">
+        </div>
+
+        <div class="input-group">
+            <label>측정 시간</label>
+            <div class="time-inputs">
+                <div class="input-group">
+                    <input type="number" id="hoursInput" placeholder="시간">
+                </div>
+                <div class="input-group">
+                    <input type="number" id="minutesInput" placeholder="분" min="0" max="59">
+                </div>
+                <div class="input-group">
+                    <input type="number" id="secondsInput" placeholder="초" min="0" max="59">
+                </div>
+            </div>
+        </div>
+
+        <button id="calculateBtn">계산하기</button>
+
+        <div id="validationMessage" class="validation-message"></div>
+
+        <div class="result-section">
+            <h2>계산 결과</h2>
+            
+            <div class="result-group">
+                <h3>1시간</h3>
+                <div class="result-items-wrapper">
+                    <div class="result-item">
+                        <span>경험치 (%)</span>
+                        <strong id="hourlyExp">0.0000</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>골드</span>
+                        <strong id="hourlyGold">0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-group">
+                <h3>하루</h3>
+                <div class="result-items-wrapper">
+                    <div class="result-item">
+                        <span>경험치 (%)</span>
+                        <strong id="dailyExp">0.0000</strong>
+                    </div>
+                    <div class="result-item">
+                        <span>골드</span>
+                        <strong id="dailyGold">0</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM 요소 가져오기
+        const expInput = document.getElementById('expInput');
+        const goldInput = document.getElementById('goldInput');
+        const hoursInput = document.getElementById('hoursInput');
+        const minutesInput = document.getElementById('minutesInput');
+        const secondsInput = document.getElementById('secondsInput');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const hourlyExpEl = document.getElementById('hourlyExp');
+        const hourlyGoldEl = document.getElementById('hourlyGold');
+        const dailyExpEl = document.getElementById('dailyExp');
+        const dailyGoldEl = document.getElementById('dailyGold');
+        const validationMessageEl = document.getElementById('validationMessage');
+
+        // 골드 입력창에 3자리마다 쉼표 추가하는 기능
+        goldInput.addEventListener('input', (e) => {
+            let value = e.target.value;
+            const numberValue = value.replace(/[^0-9]/g, '');
+            if (numberValue) {
+                e.target.value = parseInt(numberValue, 10).toLocaleString('ko-KR');
+            } else {
+                e.target.value = '';
+            }
+        });
+
+        // 계산 버튼 클릭 이벤트 리스너 추가
+        calculateBtn.addEventListener('click', () => {
+            validationMessageEl.textContent = '';
+
+            const exp = parseFloat(expInput.value) || 0;
+            const gold = parseFloat(goldInput.value.replace(/,/g, '')) || 0;
+
+            if (exp === 0 && gold === 0) {
+                validationMessageEl.textContent = '획득 경험치 또는 획득 골드를 입력해주세요';
+                return;
+            }
+
+            const hours = parseInt(hoursInput.value) || 0;
+            const minutes = parseInt(minutesInput.value) || 0;
+            const seconds = parseInt(secondsInput.value) || 0;
+
+            if (minutes >= 60) {
+                validationMessageEl.textContent = '"분"은 60 미만의 숫자를 입력해주세요';
+                return;
+            }
+
+            if (seconds >= 60) {
+                validationMessageEl.textContent = '"초"는 60 미만의 숫자를 입력해주세요';
+                return;
+            }
+
+            const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+
+            if (totalSeconds === 0) {
+                validationMessageEl.textContent = '측정 시간은 1초 이상 입력해주세요.';
+                return;
+            }
+
+            const expPerSecond = exp / totalSeconds;
+            const goldPerSecond = gold / totalSeconds;
+            const hourlyExp = expPerSecond * 3600;
+            const hourlyGold = goldPerSecond * 3600;
+            const dailyExp = hourlyExp * 24;
+            const dailyGold = hourlyGold * 24;
+            
+            hourlyExpEl.textContent = hourlyExp.toFixed(4);
+            dailyExpEl.textContent = dailyExp.toFixed(4);
+            
+            hourlyGoldEl.textContent = Math.round(hourlyGold).toLocaleString('ko-KR');
+            dailyGoldEl.textContent = Math.round(dailyGold).toLocaleString('ko-KR');
+        });
+    </script>
+
+</body>
+</html>
