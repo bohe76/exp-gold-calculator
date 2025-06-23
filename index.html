@@ -117,10 +117,16 @@
         .validation-message {
             color: var(--error-color);
             text-align: center;
-            margin-top: 15px;
-            min-height: 2.8em; 
             line-height: 1.4;
             font-size: 0.9rem;
+            border-radius: 8px;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        /* [수정] 메시지 내용이 있을 때만 보이도록 스타일 적용 (테두리 제거) */
+        .validation-message:not(:empty) {
+            margin-top: 15px;
+            padding: 10px;
         }
 
         .result-section {
@@ -135,47 +141,36 @@
             color: var(--text-color);
         }
         
-        .result-group {
-            border-radius: 8px;
-            margin-bottom: 15px;
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .result-table th, .result-table td {
             border: 1px solid var(--border-color);
-            overflow: hidden; 
-        }
-
-        .result-group h3 {
-            margin: 0;
             padding: 12px;
-            font-size: 1.1rem;
-            color: var(--text-color);
-            text-align: center;
+            vertical-align: middle;
+        }
+
+        .result-table thead th {
             background-color: var(--input-bg-color);
-        }
-        
-        .result-items-wrapper {
-            padding: 10px 15px;
+            color: var(--text-color);
+            font-weight: 600;
         }
 
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 5px;
-        }
-
-        .result-group .result-item:not(:last-child) {
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .result-item span {
+        .result-table tbody td:first-child {
+            text-align: center;
+            font-weight: 600;
             color: var(--label-color);
-            font-weight: 600;
-            min-width: 110px;
+            width: 35%;
         }
-
-        .result-item strong {
-            font-size: 1.2rem;
-            color: var(--primary-color);
+        
+        .result-table tbody td:not(:first-child) {
+            text-align: right;
+            font-size: 1.1rem;
             font-weight: 600;
+            color: var(--primary-color);
         }
         
         input[type=number]::-webkit-inner-spin-button, 
@@ -225,33 +220,28 @@
         <div class="result-section">
             <h2>계산 결과</h2>
             
-            <div class="result-group">
-                <h3>1시간</h3>
-                <div class="result-items-wrapper">
-                    <div class="result-item">
-                        <span>경험치 (%)</span>
-                        <strong id="hourlyExp">0.0000</strong>
-                    </div>
-                    <div class="result-item">
-                        <span>골드</span>
-                        <strong id="hourlyGold">0</strong>
-                    </div>
-                </div>
-            </div>
+            <table class="result-table">
+                <thead>
+                    <tr>
+                        <th>항목</th>
+                        <th>1시간</th>
+                        <th>하루</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>경험치 (%)</td>
+                        <td id="hourlyExp">0</td>
+                        <td id="dailyExp">0</td>
+                    </tr>
+                    <tr>
+                        <td>골드</td>
+                        <td id="hourlyGold">0</td>
+                        <td id="dailyGold">0</td>
+                    </tr>
+                </tbody>
+            </table>
 
-            <div class="result-group">
-                <h3>하루</h3>
-                <div class="result-items-wrapper">
-                    <div class="result-item">
-                        <span>경험치 (%)</span>
-                        <strong id="dailyExp">0.0000</strong>
-                    </div>
-                    <div class="result-item">
-                        <span>골드</span>
-                        <strong id="dailyGold">0</strong>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -332,12 +322,10 @@
             const dailyExp = hourlyExp * 24;
             const dailyGold = hourlyGold * 24;
             
-            // [수정] 숫자 포맷팅 옵션
             const expFormatOptions = {
-                maximumFractionDigits: 4 // 최대 소수점 4자리
+                maximumFractionDigits: 4
             };
             
-            // toLocaleString을 사용하여 불필요한 0을 제거하고 서식을 지정
             hourlyExpEl.textContent = hourlyExp.toLocaleString('ko-KR', expFormatOptions);
             dailyExpEl.textContent = dailyExp.toLocaleString('ko-KR', expFormatOptions);
             
