@@ -269,6 +269,14 @@
         const dailyGoldEl = document.getElementById('dailyGold');
         const validationMessageEl = document.getElementById('validationMessage');
 
+        // 경험치 입력창에서 포커스가 벗어날 때, 불필요한 0을 정리
+        expInput.addEventListener('change', (e) => {
+            const value = e.target.value;
+            if (value) {
+                e.target.value = parseFloat(value);
+            }
+        });
+
         // 골드 입력창에 3자리마다 쉼표 추가하는 기능
         goldInput.addEventListener('input', (e) => {
             let value = e.target.value;
@@ -286,6 +294,10 @@
 
             const exp = parseFloat(expInput.value) || 0;
             const gold = parseFloat(goldInput.value.replace(/,/g, '')) || 0;
+            
+            if (expInput.value && !expInput.value.includes('.')) {
+                validationMessageEl.textContent = '소수점 없이 획득 경험치를 입력하였습니다';
+            }
 
             if (exp === 0 && gold === 0) {
                 validationMessageEl.textContent = '획득 경험치 또는 획득 골드를 입력해주세요';
@@ -320,8 +332,14 @@
             const dailyExp = hourlyExp * 24;
             const dailyGold = hourlyGold * 24;
             
-            hourlyExpEl.textContent = hourlyExp.toFixed(4);
-            dailyExpEl.textContent = dailyExp.toFixed(4);
+            // [수정] 숫자 포맷팅 옵션
+            const expFormatOptions = {
+                maximumFractionDigits: 4 // 최대 소수점 4자리
+            };
+            
+            // toLocaleString을 사용하여 불필요한 0을 제거하고 서식을 지정
+            hourlyExpEl.textContent = hourlyExp.toLocaleString('ko-KR', expFormatOptions);
+            dailyExpEl.textContent = dailyExp.toLocaleString('ko-KR', expFormatOptions);
             
             hourlyGoldEl.textContent = Math.round(hourlyGold).toLocaleString('ko-KR');
             dailyGoldEl.textContent = Math.round(dailyGold).toLocaleString('ko-KR');
